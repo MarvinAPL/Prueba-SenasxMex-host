@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>SeñaMex</title>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <!-- Custom Google font-->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100;200;300;400;500;600;700;800;900&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="../css/styles_saludos.css" rel="stylesheet" />
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <title>Detección de Gestos</title>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+
+    <body">
+         <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container_navbar">
+                <div class="nav_logo">
+                    <a class="brand" href="/inicio.html">
+                        <span class="logo">SeñaMex</span>
+                    </a>
+                </div>
+                <div class="nav-items">
+                    <a href="/inicio.html" class="nav-link">Inicio</a>
+                    <a href="/templates/alfabetoma.html" class="nav-link">Alfabeto</a>
+                    <a href="/templates/deletreo.html" class="nav-link">Deletreo</a>
+                    <a href="/templates/proyecto.html" class="nav-link">Proyecto</a>
+                    <a href="/templates/contacto.html" class="nav-link">Equipo</a>
+                    <a href="./index.html" class="nav-link logout">Salir</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <ul>
+                <li><a href="/gestos">Abecedario</a></li>
+                <li><a href="/gestos/saludos">Saludos</a></li>
+                <li><a href="/gestos/emociones">Emociones</a></li>
+                <li><a href="#" class="active">Presentación</a></li>
+                <li><a href="/gestos/negacion">Negación y Existencia</a></li>
+                <li><a href="/gestos/ubicacion">Ubicación</a></li>
+                <li><a href="/gestos/problemas">Problemas y Situaciones</a></li>
+                <li><a href="/gestos/estadosanimo">Estados de Ánimo</a></li>
+                <li><a href="/gestos/conducta">Conducta y Comportamiento</a></li> 
+                <li><a href="/gestos/salud">Salud y Bienestar</a></li>
+                <li><a href="/gestos/familia">Familia y Relaciones</a></li>
+                <li><a href="/gestos/comunicacion">Comunicación e Interacción</a></li>
+                <li><a href="/gestos/tiempo">Tiempo y Cantidad</a></li>
+                <li><a href="/gestos/verbos">Acciones y Verbos</a></li>
+                <li><a href="/gestos/descripcion">Descripción y Calidad</a></li>
+                <li><a href="/gestos/preguntas">Preguntas Específicas</a></li>
+            </ul>
+        </div>
+
+        <div class="hero">
+        <div class="container_principal">
+            <div class="container_titulo">
+                <h1 class="h1_titulo"><span class="icon">🖐️</span> Detección de Señas</h1>
+            </div>
+
+            <div class="container_contenidoP">
+                <div class="container_video">
+                    <video id="video" autoplay></video>
+                    <canvas id="canvas" width="640" height="420" style="display:none;"></canvas>
+                    <div id="result"></div>
+                </div>
+                
+                <div class="container_ejemplo">
+                    <h2>Gesto Objetivo:</h2>
+                    <div class="img_cont">
+                        <video id="targetVideo" muted autoplay loop></video>
+                        <div class="letter_box">
+                            <p id="targetLabel"></p>
+                        </div>
+                    </div>
+                    
+                    <img id="checkmark" src="/static/check_image/checkmark.png" alt="Correct!">
+                    <div class="button-container">
+                        <button class="button-siguiente" id="skipButton">Siguiente Seña
+                            <div class="hoverEffect">
+                                <div></div>
+                            </div>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+    crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const resultDiv = document.getElementById('result');
+    const targetLabel = document.getElementById('targetLabel');
+    const checkmark = document.getElementById('checkmark');
+    const skipButton = document.getElementById('skipButton');
+
+    // Solicitar acceso a la cámara
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            video.srcObject = stream;
+        })
+        .catch(err => console.error('Error accessing camera:', err));
+
+    function skipToNextVideo() {
+        fetch('http://localhost:5000/gestos/presentacion/skip', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    loadNewVideo();  // Cargar el nuevo video
+                } else {
+                    console.error('Error al cambiar la seña:', data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function loadNewVideo() {
+        fetch('http://localhost:5000/gestos/presentacion/get_current_video')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const targetVideo = document.getElementById('targetVideo');
+                    targetVideo.src = data.video_url;
+                    targetLabel.textContent = data.target;
+
+                    // Reproducir el video automáticamente
+                    targetVideo.play();
+
+                    // Obtener el audio
+                    const audioName = data.target;
+                    const audioPath = `/assets/audio/presentation/${audioName}.mp3`;
+
+                    // Crear un elemento audio
+                    const audioElement = new Audio(audioPath);
+
+                    // Manejar errores
+                    audioElement.onerror = () => {
+                        console.error('Error al cargar el audio:', audioPath);
+                    };
+
+                    // Reproducir el audio
+                    audioElement.play().catch(error => console.error('Error al reproducir audio:', error));
+
+                    // Verificar si es el último video
+                    //if (data.is_last) {
+                    //alert('¡Felicidades! Has completado la secuencia.');
+                    //}
+                } else {
+                    console.error('Error al cargar el video:', data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function captureFrame() {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = canvas.toDataURL('image/jpeg');
+
+        fetch('http://localhost:5000/gestos/presentacion/predict', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ frame: imageData.split(',')[1] })
+        })
+            .then(response => response.json())
+            .then(data => {
+                resultDiv.textContent = `Predicción: ${data.prediction}`;
+                if (data.is_correct) {
+                    const audio = new Audio('/static/check_image/check.mp3');
+                    audio.play();
+
+                    checkmark.style.display = 'block';
+                    setTimeout(() => {
+                        checkmark.style.display = 'none';
+                        loadNewVideo();  // Cargar un nuevo video si la predicción es correcta
+                    }, 1000);
+                } else {
+                    checkmark.style.display = 'none';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Agregar evento click al botón de saltar
+    skipButton.addEventListener('click', skipToNextVideo);
+
+    // Cargar el primer video al iniciar
+    loadNewVideo();
+
+    // Capturar frames cada segundo
+    setInterval(captureFrame, 1000);
+
+    lucide.createIcons();
+
+    $(document).ready(function () {
+        $('.navbar-toggler').click(function () {
+            $('.sidebar').toggleClass('sidebar-visible');
+        });
+    });
+
+    window.onload = function () {
+        document.getElementById("targetLabel").innerText = "";  // Si se muestra en un div
+    };
+</script>
+
+<script>
+        // Menú hamburguesa
+    const hamburger = document.createElement('div');
+    hamburger.className = 'hamburger';
+    hamburger.innerHTML = `
+        <span></span>
+        <span></span>
+        <span></span>
+    `;
+    
+    const navbar = document.querySelector('.container_navbar');
+    const navItems = document.querySelector('.nav-items');
+    
+    // Insertar hamburguesa antes de los nav-items
+    navbar.insertBefore(hamburger, navItems);
+    
+    // Toggle del menú
+    hamburger.addEventListener('click', function() {
+        this.classList.toggle('active');
+        navItems.classList.toggle('active');
+    });
+    
+    // Cerrar menú al hacer clic en un enlace
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function() {
+            hamburger.classList.remove('active');
+            navItems.classList.remove('active');
+        });
+    });
+</script>
+
+
+</body>
+</html>
