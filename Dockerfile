@@ -1,3 +1,4 @@
+# Imagen base con Python y Node.js
 FROM python:3.10-slim
 
 # Instalar dependencias del sistema
@@ -12,18 +13,18 @@ RUN apt-get update && apt-get install -y \
 # Crear carpeta de trabajo
 WORKDIR /app
 
-# Copiar dependencias de Python e instalar
+# Copiar dependencias y archivos
 COPY requirements.txt ./
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Copiar todo el proyecto
+# Copiar el resto del código
 COPY . .
 
 # Dar permisos al script
 RUN chmod +x start.sh
 
-# Exponer solo el puerto que Render debe usar
-EXPOSE 3000
+# Exponer el puerto que usará gunicorn
+EXPOSE 5000
 
-# Comando principal
+# Comando de inicio
 CMD ["./start.sh"]

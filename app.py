@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request, url_for
+from flask import Flask, render_template, jsonify, request, send_from_directory, url_for
 import cv2
 import mediapipe as mp
 import numpy as np
@@ -9,6 +9,37 @@ from flask_cors import CORS
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
 CORS(app)
+
+# Configuración para servir archivos estáticos desde las carpetas existentes
+@app.route('/static/<path:filename>')
+def static_files(filename):
+    return send_from_directory('static', filename)
+
+@app.route('/assets/<path:filename>')
+def assets_files(filename):
+    return send_from_directory('assets', filename)
+
+@app.route('/js/<path:filename>')
+def js_files(filename):
+    return send_from_directory('js', filename)
+
+@app.route('/css/<path:filename>')
+def css_files(filename):
+    return send_from_directory('css', filename)
+
+# Rutas principales
+@app.route('/')
+def home():
+    return send_from_directory('.', 'index.html')
+
+@app.route('/inicio.html')
+def inicio():
+    return send_from_directory('.', 'inicio.html')
+
+# Rutas para las secciones (manteniendo tu estructura actual)
+@app.route('/templates/<template_name>')
+def templates(template_name):
+    return send_from_directory('templates', template_name)
 
 # Cargar modelos
 #Modelo Abecedario
