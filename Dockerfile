@@ -1,6 +1,6 @@
-# Imagen base con Python y Node.js
 FROM python:3.10-slim
 
+# Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
     build-essential \
     libgl1-mesa-glx \
@@ -9,28 +9,21 @@ RUN apt-get update && apt-get install -y \
     npm \
     && rm -rf /var/lib/apt/lists/*
 
+# Crear carpeta de trabajo
 WORKDIR /app
 
-# 5. Copiar aplicación
+# Copiar dependencias de Python e instalar
+COPY requirements.txt ./
+RUN pip install --upgrade pip && pip install -r requirements.txt
+
+# Copiar todo el proyecto
 COPY . .
 
-# 3. Copiar e instalar dependencias Python
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+# Dar permisos al script
+RUN chmod +x start.sh
 
-# 4. Copiar e instalar dependencias Node
-RUN npm install
-
-# 5. Copiar aplicación
-COPY . .
-
-# 6. Variables de entorno
-ENV FLASK_APP=app.py
-ENV FLASK_ENV=production
-
-# 7. Exponer puertos (sin comentarios en línea)
-EXPOSE 5000
+# Exponer solo el puerto que Render debe usar
 EXPOSE 3000
 
-# 8. Comando de inicio
+# Comando principal
 CMD ["./start.sh"]
