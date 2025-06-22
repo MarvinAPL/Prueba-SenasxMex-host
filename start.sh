@@ -1,10 +1,7 @@
 #!/bin/bash
 
-# Levantar el frontend (en segundo plano)
-cd frontend
-npm install
-npm run build &
-cd ..
+# Iniciar Node.js en segundo plano para MQTT/WebSockets
+node index.js &
 
-# Ejecutar Flask con Gunicorn
-exec gunicorn -b 0.0.0.0:5000 app:app
+# Iniciar Flask con Gunicorn en el puerto de Render
+gunicorn --bind 0.0.0.0:$PORT --timeout 600 --workers 4 app:app

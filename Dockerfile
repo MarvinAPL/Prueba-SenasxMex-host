@@ -1,30 +1,26 @@
-# Imagen base con Python y Node.js
-FROM python:3.10-slim
+FROM python:3.9-slim
 
-# Instalar dependencias del sistema
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libgl1-mesa-glx \
-    libglib2.0-0 \
-    nodejs \
-    npm \
-    && rm -rf /var/lib/apt/lists/*
+# Instalar Node.js y dependencias del sistema
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
+    apt-get install -y nodejs && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Crear carpeta de trabajo
 WORKDIR /app
 
-# Copiar dependencias y archivos
+# Copiar primero los archivos de dependencias para cachear
+COPY package.json package-lock.json ./
 COPY requirements.txt ./
-RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Copiar el resto del código
+# Instalar dependencias
+RUN npm install && pip install --no-cache-dir -r requirements.txt gunicorn
+
+# Copiar el resto de la aplicación
 COPY . .
 
-# Dar permisos al script
-RUN chmod +x start.sh
+# Puerto que Render requiere (10000 es el estándar)
+EXPOSE 10000
 
-# Exponer el puerto que usará gunicorn
-EXPOSE 5000
-
-# Comando de inicio
 CMD ["./start.sh"]

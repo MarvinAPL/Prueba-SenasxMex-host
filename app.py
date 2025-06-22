@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, jsonify, request, send_from_directory, url_for
 import cv2
 import mediapipe as mp
@@ -882,5 +883,5 @@ def process_prediction(model_used, labels):
         return jsonify({'prediction': f'Error: {str(e)}'})
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000)
-
+    port = int(os.environ.get('PORT', 10000))
+    app.run(host='0.0.0.0', port=port)
