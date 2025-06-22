@@ -1,26 +1,29 @@
-FROM python:3.9-slim
+FROM python:3.10-slim
 
-# Instalar Node.js y dependencias del sistema
-RUN apt-get update && \
-    apt-get install -y curl && \
-    curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
-    apt-get install -y nodejs && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# Instalar dependencias del sistema
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    nodejs \
+    npm \
+    && rm -rf /var/lib/apt/lists/*
 
+# Crear carpeta de trabajo
 WORKDIR /app
 
-# Copiar primero los archivos de dependencias para cachear
-COPY package.json package-lock.json ./
+# Copiar dependencias de Python e instalar
 COPY requirements.txt ./
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Instalar dependencias
-RUN npm install && pip install --no-cache-dir -r requirements.txt gunicorn
-
-# Copiar el resto de la aplicación
+# Copiar todo el proyecto
 COPY . .
 
-# Puerto que Render requiere (10000 es el estándar)
+# Dar permisos al script
+RUN chmod +x start.sh
+
+# Exponer solo el puerto que Render debe usar
 EXPOSE 10000
 
+# Comando principal
 CMD ["./start.sh"]
