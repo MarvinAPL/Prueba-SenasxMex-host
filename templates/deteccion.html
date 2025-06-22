@@ -134,7 +134,7 @@
 
 
     function skipToNextSign() {
-        fetch('http://localhost:5000/gestos/skip', {
+        fetch('/gestos/skip', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -170,7 +170,7 @@
     }
 
     function loadNewImage() {
-        fetch('http://localhost:5000/gestos/get_current_image')  // Usar la URL completa
+        fetch('/gestos/get_current_image')  // Usar la URL completa
             .then(response => response.json())
             .then(data => {
                 targetImage.src = data.image_url;
@@ -205,7 +205,7 @@
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         const imageData = canvas.toDataURL('image/jpeg');
 
-        fetch('http://localhost:5000/gestos/predict', {
+        fetch('/gestos/predict', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -242,7 +242,7 @@
     let lastAudio = null; // Para evitar reproducir el audio dos veces
 
     function skipToNextSign() {
-        fetch('http://localhost:5000/gestos/skip', {
+        fetch('/gestos/skip', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
